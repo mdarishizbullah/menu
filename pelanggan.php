@@ -1,62 +1,10 @@
 <?php
 session_start();
-include "php/conn.php";
-
-if(isset($_SESSION["login"])){
-	header("Location: pelanggan.php");
+if(!isset($_SESSION["login"])){
+	header("Location: index.php");
 	exit;
-}else if(isset($_SESSION["ksradm"])){
-	header("Location: kasir.php");
-	exit;
-}else if(isset($_SESSION["mngradm"])){
-	header("Location: manager.php");
-	exit;
-}else if(isset($_SESSION["mngr"])){
-	header("Location: direktur.php");
-	exit;
-}
-
-if(isset($_POST["login"])){
-	$id_pelanggan = $_POST["phoneNumber"];
-	$plg_password = $_POST["userPassword"];
-	$result = mysqli_query($conn, "SELECT * FROM pelanggan WHERE id_pelanggan = '$id_pelanggan'");
-	if(mysqli_num_rows($result) === 1){
-		$row = mysqli_fetch_assoc($result);
-		
-			if($row["plg_jabatan"] == 1){
-			if(password_verify($plg_password, $row["plg_password"])){
-			$_SESSION["login"] = true;
-			$_SESSION["id_pelanggan"] = $row["id_pelanggan"];
-			header("Location: pelanggan.php");
-			exit;
-			}
-			}else if($row["plg_jabatan"] == 2){
-				if(password_verify($plg_password, $row["plg_password"])){
-			$_SESSION["ksradm"] = true;
-			$_SESSION["id_pelanggan"] = $row["id_pelanggan"];
-			header("Location: kasir.php");
-			exit;
-			}
-			}else if($row["plg_jabatan"] == 3){
-				if(password_verify($plg_password, $row["plg_password"])){
-			$_SESSION["mngradm"] = true;
-			$_SESSION["id_pelanggan"] = $row["id_pelanggan"];
-			header("Location: manager.php");
-			exit;
-				}
-		}else if($row["plg_jabatan"] == 4){
-				if(password_verify($plg_password, $row["plg_password"])){
-			$_SESSION["mngr"] = true;
-			$_SESSION["id_pelanggan"] = $row["id_pelanggan"];
-			header("Location: direktur.php");
-			exit;
-				}
-		}
-	}
-	$error = true;
 }
 ?>
-
 <!DOCTYPE HTML>
 <html lang="en">
   <head>
@@ -105,12 +53,11 @@ if(isset($_POST["login"])){
 	  <div id="cart" style="display: none;">
 			<div id="isiKeranjang">
 			</div>
+			<div id="perhitunganPesan" style="display: none;">
 			<div class="row">
-				<div class="container">
 				<div class="col-6 text-muted mt-3">Total</div>
 				<input class="col-6 col-md-12 text-end border-0 bg-white" id="total" style="display: none;" disabled>
-				<input class="col-6 col-md-12 text-end border-0 bg-white" id="totalC" disabled>
-				</div>
+				<input class="col-6 col-md-12 text-end text-dark border-0 bg-white" id="totalC" disabled>
 			</div>
 			<div class="row">
 				<div class="container col-4">
@@ -145,7 +92,9 @@ if(isset($_POST["login"])){
 			</div>
 			</div>
 			<div class="row">
-				<div class="container">
+				<div class="container col-4">
+				</div>
+				<div class="container col-8">
 				  <select class="form-select mt-2 text-center" id="notMakan">
 					<option value="makan ditempat">Makan ditempat
 					</option>
@@ -176,14 +125,22 @@ if(isset($_POST["login"])){
 				</div>
 			</div>
 			<div class="row">
+				<input type="number" class="form-control" id="lengKer"  style="display: none;" disabled>
 				<input type="number" class="form-control" id="waktuMs"  style="display: none;" disabled>
 				<input type="text" class="form-control" id="hasilSemua"  style="display: none;" disabled>
-				<input type="text" class="form-control" id="idPelanggan"  style="display: none;" disabled>
 			</div>
 			<div class="row">
 			<div class="container">
-				<button class="btn btn-primary mt-2 col-12" onClick="pesanSekarang()">Pesan sekarang</button>
+				<button class="btn btn-primary mt-2 col-12" onClick="pesanSekarang()">Pesan Sekarang</button>
 			</div>
+			</div>
+			</div>
+			<div class="text-center" id="belumKeranjang" style="display: block;">
+				<h1>Upss.. Keranjangmu kosong<h1>
+				<br>
+				<p>Masukan beberapa item favoritmu !<p>
+				<br>
+				<button class="btn btn-primary" onclick="pindahHome()">Pilih Menu Favoritmu !</button>
 			</div>
 	  </div>
 	  <!--DONE-->
@@ -203,7 +160,7 @@ if(isset($_POST["login"])){
 			<br>
 			<br>
 			<br>
-			<div class="text-center" id="belumPesan">
+			<div class="text-center" id="belumPesan" style="display: block;">
 				<h1>Kamu belum memesan apapun<h1>
 				<br>
 				<p>Ayo pesan sekarang<p>
@@ -214,130 +171,20 @@ if(isset($_POST["login"])){
 			</div>
 	  </div>
 	  <!--PERSON-->
-	  <div id="person" style="display: none;">
-		<div class="container">
-		<div id="untukLogin" style="display: block;">
-		  <div class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4" >
-			<div class="container">
-			  <div class="row justify-content-center">
-				<div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-				  <div class="card mb-3">
-					<div class="card-body">
-					  <div class="pt-4 pb-2">
-						<h5 class="card-title text-center pb-0 fs-4">Login ke akunmu</h5>
-						<p class="text-center small">Masukan nomor ponsel & password untuk login</p>
-						<p class="text-success text-center small" id="sudahDaftar"></p>
-					  </div>
-					  <form class="row g-3" action="" method="post">
-						<div class="col-12">
-						  <label for="phoneNumber" class="form-label">Nomor Ponsel</label>
-						  <div class="input-group">
-							<span class="input-group-text" id="inputGroupPrepend">+62</span>
-							<input type="number" class="form-control" name="phoneNumber" id="phoneNumber">
-						  </div>
-						</div>
-						<div class="col-12">
-							<p class="text-success mb-0" style="display: none;" id="verNoSesuai">Nomor ponsel sesuai</p>
-							<p class="text-danger mb-0" style="display: none;" id="verNobelumDaftar">Nomor ponsel belum terdaftar!</p>
-							<input type="number" id="hasilNoHpLogin" style="display: none;" disabled>
-						</div>
-						<div class="col-12">
-						  <label for="userPassword" class="form-label">Password</label>
-						  <input type="password" name="userPassword" class="form-control mb-2" id="userPassword">
-						</div>
-						  <?php if(isset($error)) : ?>
-						<div class="col-12">
-						  <p class="text-danger mb-0" style="display: block;" id="passwordLoginSalah">Password salah</p>
-						</div>
-						 <?php endif;?>
-						<div class="col-12">
-						  <button class="btn btn-primary w-100 mb-2" id="submitUntukLogin" type="submit" name="login" style="display: none;">Login</button>
-						</div>
-						<div class="row">
-						<div class="col-8">
-						  <p class="small mb-0">Belum memiliki akun?</p>
-						</div>
-						<div class="col-4">
-						<div>
-						  <p class="text-primary small mb-0" onclick="pindahRegister()">Daftar</p>
-						  </div>
-						</div>
-						</div>
-					  </form>
-					</div>
-				  </div>
-				</div>
-			  </div>
+	  <div class="container" id="person" style="display: none;">
+	  <div class="row">
+	  <div class="col-9">
+	  </div>
+	  <div class="col-3">
+	  <a class="small mb-0 mt-2 btn btn-danger stretched-link" href="logout.php">Logout</a>
+	  </div>
+	  </div>
+	  <div class="text-center"style="display: block;">
+				<h1 class="mb-3">Terimakasih Telah Mejadi Pelanggan Setia Kami<h1>
+				<br>
+				<div class="text-muted" id="namaUser"></div>
+				<br>
 			</div>
-		  </div>
-		  </div>
-		  <div id="untukRegister" style="display: none;">
-		  <div class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-			<div class="container">
-			  <div class="row justify-content-center">
-				<div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-				  <div class="card mb-3">
-					<div class="card-body">
-					  <div class="pt-4 pb-2">
-						<h5 class="card-title text-center pb-0 fs-4">Buat akunmu</h5>
-						<p class="text-center small">Jadilah pelanggan setia kami</p>
-					  </div>
-					  <div class="row g-3 needs-validation" novalidate>
-						<div class="col-12">
-						  <label class="form-label">Nama Lengkap</label>
-						  <input type="text" name="name" class="form-control" id="namaDaftar" onkeyup="checkNama()">
-						  <p class="text-danger mb-0" style="display: none;" id="checkNama">Tolong masukan namamu!</p>
-						</div>
-						<div class="col-12">
-						  <label class="form-label">Nomor ponsel</label>
-						  <div class="input-group has-validation mb-0">
-							<span class="input-group-text" id="inputGroupPrepend">+62</span>
-							<input type="number" class="form-control" id="noPonsel">
-						  </div>
-						</div>
-						<div class="col-12">
-							<p class="text-danger mb-0" style="display: none;" id="verNoPonselPendek">Nomor ponsel terlalu pendek!</p>
-							<p class="text-danger mb-0" style="display: none;" id="verNoPonselTerdaftar">Nomor ponsel sudah terdaftar, lakukan login!</p>
-							<p class="text-danger mb-0" style="display: none;" id="verNoPonselPanjang">Nomor ponsel terlalu panjang!</p>
-							<input type="number" id="hasilNoHp" style="display: none;" disabled>
-						</div>
-						<div class="col-12">
-						  <label for="yourPassword" class="form-label">Password</label>
-						  <form>
-						  <input type="password" class="form-control" id="password1" name="new-password">
-						  </form>
-						</div>
-						<div class="col-12">
-						  <label for="yourPassword" class="form-label">Konfirmasi password</label>
-						  <form>
-						  <input type="password" name="password" onkeyup="checkKonPas()" class="form-control" id="password2">
-						  </form>
-						  <p class="text-danger mb-0" style="display: none;" id="verPasswordSalah">Password tidak sama!</p>
-						  <p class="text-danger mb-0" style="display: none;" id="verPasswordKosong">Password tidak boleh kosong</p>
-						  <p class="text-success mb-0" style="display: none;" id="verPasswordBenar">Password sesuai</p>
-						</div>
-						<div class="col-12">
-						  <button class="btn btn-primary w-100 mb-2" id="buttonRegister" onclick="daftarNoPonsel()" style="display: none;">Create Account</button>
-						</div>
-						<div class="row">
-						<div class="col-8">
-						  <p class="small mb-0">Already have an account?</p>
-						</div>
-						<div class="col-4">
-						<div>
-						  <p class="text-primary small mb-0" onclick="pindahLogin()">Log in</p>
-						  </div>
-						</div>
-						</div>
-					  </div>
-					</div>
-				  </div>
-				</div>
-			  </div>
-			</div>
-		</div>
-		</div>
-		</div>
 	  </div>
 	    <!--FIXED BOTTOM MENU-->
 	  <br>
@@ -400,7 +247,7 @@ if(isset($_POST["login"])){
 				<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
 				  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
 				</svg>
-				<div class="tex-center mb-0" style="font-size:10px">User</div>
+				<div class="tex-center mb-0" style="font-size:10px">Profile</div>
 			  </button>
 			</li>
 		  </ul>
@@ -409,12 +256,6 @@ if(isset($_POST["login"])){
     </div>
   <script src="js/bootstrap.bundle.min.js" charset="utf-8"></script>
   <script src="js/swiper-bundle.min.js"></script>
-  <script src="js/main.js"></script>
-  <?php if(isset($error)) : ?>
-  <script>
-	pindahPerson();
-  myTimeout = setTimeout(passwordSalah, 5000);
-  </script>
-   <?php endif;?>
+  <script src="js/script.js"></script>
   </body>
 </html>
