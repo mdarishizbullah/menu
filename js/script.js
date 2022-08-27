@@ -525,12 +525,14 @@ function isiCart(){
 		for(i = 0; i < response.length; i++){
 			
 			barisData += `
-			<div name="hapus">
-	<a class="text-start p-1"   onclick="hapusData(`+response[i].id_produk+`)">
+<div class="container-fluid" name="hapus">
+	<div class="row">
+	<a class="text-start"   onclick="hapusData(`+response[i].id_produk+`)">
 	  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
 		<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
 	  </svg>
 	</a>
+	</div>
 	<div class="row">
 	  <img src="./asset/menu/`+response[i].prd_image+`" class="rounded mx-auto d-block col-3">
 	  <div class="row col-9">
@@ -554,7 +556,7 @@ function isiCart(){
 	  <div class="col-4 text-muted mt-2">Quantity
 	  </div>
 	  <div class="col-8">
-		<div class="d-flex align-items-center">
+		<div class="align-items-center">
 		  <input class="form-control text-center input-items" name="jumlah" id="jumlah`+response[i].id_produk+`" type="number" value="`+response[i].cart_jumlah+`" onchange="merubah(`+response[i].id_produk+`)">
 		</div>
 	  </div>
@@ -569,7 +571,7 @@ function isiCart(){
 	  </div>
 	  <input class="col-6 text-end input-items border-0 bg-white mt-0" id="hasila`+response[i].id_produk+`" value="Rp. `+parseFloat(response[i].cart_jumlah*response[i].prd_harga).toLocaleString('en')+`" style="display: block;" disabled>
 	</div>
-	</div>
+</div>
 			`;
 		}
 		container.innerHTML = barisData;
