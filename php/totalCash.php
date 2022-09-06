@@ -13,4 +13,4 @@ $result = mysqli_query($conn, "SELECT sum(not_total) FROM nota WHERE not_ver = '
 $row = mysqli_fetch_assoc($result);
 $isi = $row["sum(not_total)"];
 
-echo ($isi);
+echo json_encode($isi);

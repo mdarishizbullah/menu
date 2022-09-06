@@ -190,7 +190,7 @@ if(!isset($_SESSION["ksradm"])){
 			<!-- Modal Header -->
 			<div class="modal-header">
 			  <p class="modal-title mb-0">
-				`Apakah anda yakin untuk logou
+				`Apakah anda yakin untuk logout
 			  </p>
 			</div>
 			<!-- Modal body -->
@@ -401,8 +401,18 @@ if(!isset($_SESSION["ksradm"])){
 	  <br>
 	  <br>
 	  <div class="row">
-	  <div class="col-"><div class="text-muted fw-bold">Total Keuntungan :</div></div>
-	  <div class="col-6"><div class="text-center text-muted fw-bold" id="totalKeuntungan"></div></div>
+	  <div class="col-6"><div class="text-muted fw-bold">Produk Terjual :</div></div>
+	  <div class="col-6"><div class="text-center text-muted fw-bold" ></div></div>
+	  </div>
+	  <div class="row">
+	  <div class="col-4"><div class="text-muted text-center fw-bold">Produk</div></div>
+	  <div class="col-4"><div class="text-muted text-center fw-bold">Kategori</div></div>
+	  <div class="col-4"><div class="text-muted text-center fw-bold">Jumlah</div></div>
+	  </div>
+	  <div class="container-fluid" id="isiProdukTerjual">
+	  </div>
+	  <div class="row">
+	  <div class="col-3"><div class="btn btn-secondary" onclick="istirahat()">Istirahat</div></div>
 	  </div>
 	  </div>
 	  

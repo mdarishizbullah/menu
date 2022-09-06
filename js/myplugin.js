@@ -904,7 +904,7 @@ function isiPendapatan(){
 	xhr.onload = function(){
 		let response = JSON.parse(this.responseText);
 		let jumlahPendapatan = response.length;
-		if(jumlahPendapatan == 0){
+		/*if(jumlahPendapatan == 0){
 			document.getElementById("jumlahPendapatan").style.display='none';
 			document.getElementById("fixedTopPendapatan").style.display='none';
 			document.getElementById("belumAdaTransaksi").style.display='block';
@@ -913,7 +913,7 @@ function isiPendapatan(){
 			document.getElementById("belumAdaTransaksi").style.display='none';
 			document.getElementById("jumlahPendapatan").style.display='block';
 			document.getElementById("jumlahPendapatan").innerHTML = jumlahPendapatan;
-		}
+		}*/
 		let barisData ='';
 		for(i = 0; i < response.length; i++){
 			
@@ -946,7 +946,7 @@ function detailPendapatan(idSesuai){
 	document.getElementById("isiNotaPendapatan"+idSesuai).style.display='block';
 	let containerNota = document.getElementById("isiNotaPendapatan"+idSesuai);
 	let xhr = new XMLHttpRequest();
-	xhr.open('POST','php/detailNota.php',true);
+	xhr.open('POST','php/detailPendapatan.php',true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.onload = function(){
 		let response = JSON.parse(this.responseText);
@@ -965,6 +965,10 @@ function detailPendapatan(idSesuai){
   </div>
   <div class="row">
     <p class="mt-0 mb-0">Nomor Meja: `+response[0].not_meja+`
+    </p>
+  </div>
+  <div class="row">
+    <p class="mt-0 mb-0">Petugas: `+kapital(response[0].plg_nama)+`
     </p>
   </div>
 		`;
@@ -1081,6 +1085,7 @@ function pindahLaporan(){
 	totalCash();
 	totalCashless();
 	isiLaporan();
+	isiProdukTerjual();
 }
 
 function isiJob(){
@@ -1449,7 +1454,6 @@ function isiEditMenu(){
 function menuAktif(){
 	let containerMenu = document.getElementById("menuAktif");
 	fetch('php/dataMenuAktif.php').then(response => response.json()).then(response => {
-		console.log(response);
 		let barisData ='';
 		for(i = 0; i < response.length; i++){
 			
@@ -1473,7 +1477,6 @@ function menuAktif(){
 function menuNonAktif(){
 	let containerMenu = document.getElementById("menuNonAktif");
 	fetch('php/dataMenuNonAktif.php').then(response => response.json()).then(response => {
-		console.log(response);
 		let barisData ='';
 		for(i = 0; i < response.length; i++){
 			
@@ -1538,4 +1541,49 @@ function totalPengeluaranLaporan(){
 		document.getElementById("tPengeluaranLaporan").setAttribute('value',new Number(this.responseText));
 	}
 	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function isiProdukTerjual(){
+	let container = document.getElementById("isiProdukTerjual");
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalPenjualanPerProdak.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		let response = JSON.parse(this.responseText);
+		console.log(response);
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			
+			barisData += `
+<div class="row">
+	<div class="col-4"><div class="text-muted text-center">`+kapital(response[i].prd_nama)+`</div></div>
+	<div class="col-4"><div class="text-muted text-center">`+kapital(response[i].kat_sub)+`</div></div>
+	<div class="col-4"><div class="text-muted text-center">`+response[i].total+`</div></div>
+</div>
+<hr>
+			`;
+		}
+		container.innerHTML = barisData;
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function istirahat(){
+	document.getElementById("linkHome").style.display='block';
+	document.getElementById("linkCup").style.display='block';
+	document.getElementById("linkFood").style.display='block';
+	document.getElementById("linkCart").style.display='block';
+	document.getElementById("linkDone").style.display='block';
+	document.getElementById("linkPerson").style.display='block';
+	document.getElementById("person").style.display='block';
+	document.getElementById("linkJob").style.display='none';
+	document.getElementById("linkPendapatan").style.display='none';
+	document.getElementById("linkPengeluaran").style.display='none';
+	document.getElementById("linkLaporan").style.display='none';
+	document.getElementById("linkMenu").style.display='none';
+	//untuk loop diarea kerjaan
+	document.getElementById("laporan").style.display='none';
+	pindahHome();
+	matikanMendapatDataJob();
+	matikanCheckUpdateJob();
 }

@@ -14,6 +14,9 @@ if(isset($_SESSION["login"])){
 }else if(isset($_SESSION["mngr"])){
 	header("Location: direktur.php");
 	exit;
+}else if(isset($_SESSION["admkonten"])){
+	header("Location: adminkonten.php");
+	exit;
 }
 
 if(isset($_POST["login"])){
@@ -49,6 +52,13 @@ if(isset($_POST["login"])){
 			$_SESSION["mngr"] = true;
 			$_SESSION["id_pelanggan"] = $row["id_pelanggan"];
 			header("Location: direktur.php");
+			exit;
+				}
+		}else if($row["plg_jabatan"] == 5){
+				if(password_verify($plg_password, $row["plg_password"])){
+			$_SESSION["admkonten"] = true;
+			$_SESSION["id_pelanggan"] = $row["id_pelanggan"];
+			header("Location: adminkonten.php");
 			exit;
 				}
 		}
@@ -103,14 +113,13 @@ if(isset($_POST["login"])){
 	  </div>
 	  <!--CART-->
 	  <div id="cart" style="display: none;">
+			<div id="tampilKeranjang" style="display: none;">
 			<div id="isiKeranjang">
 			</div>
 			<div class="row">
-				<div class="container">
 				<div class="col-6 text-muted mt-3">Total</div>
 				<input class="col-6 col-md-12 text-end border-0 bg-white" id="total" style="display: none;" disabled>
 				<input class="col-6 col-md-12 text-end border-0 bg-white" id="totalC" disabled>
-				</div>
 			</div>
 			<div class="row">
 				<div class="container col-4">
@@ -145,14 +154,16 @@ if(isset($_POST["login"])){
 			</div>
 			</div>
 			<div class="row">
-				<div class="container">
+				<div class="col-4">
+				</div>
+				<div class="container col-8">
 				  <select class="form-select mt-2 text-center" id="notMakan">
 					<option value="makan ditempat">Makan ditempat
 					</option>
 					<option value="dibawa pulang">Dibawa pulang
 					</option>
 				  </select>
-				 </div>
+				</div>
 			</div>
 			<div class="row">
 				<div class="container col-4">
@@ -185,6 +196,14 @@ if(isset($_POST["login"])){
 				<button class="btn btn-primary mt-2 col-12" onClick="pesanSekarang()">Pesan sekarang</button>
 			</div>
 			</div>
+			</div>
+			<div class="text-center" id="belumTambah">
+				<h1>Kamu belum memesan apapun</h1>
+				<br>
+				<h4>Ayo pesan sekarang</h4>
+				<br>
+				<button class="btn btn-primary" onclick="pindahHome()">Pilih Menu Favoritmu !</button>
+			</div>
 	  </div>
 	  <!--DONE-->
 	  <div class="container-fluid" id="done" style="display: none;">
@@ -204,9 +223,9 @@ if(isset($_POST["login"])){
 			<br>
 			<br>
 			<div class="text-center" id="belumPesan">
-				<h1>Kamu belum memesan apapun<h1>
+				<h1>Kamu belum memesan apapun</h1>
 				<br>
-				<p>Ayo pesan sekarang<p>
+				<p>Ayo pesan sekarang</p>
 				<br>
 				<button class="btn btn-primary" onclick="pindahHome()">Pilih Menu Favoritmu !</button>
 			</div>

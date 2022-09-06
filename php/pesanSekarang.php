@@ -11,7 +11,7 @@ $not_meja = $_POST['meja'];
 $not_total = $_POST['totalNota'];
 $not_catatan = $_POST['catatan'];
 
-$sql = "INSERT INTO nota (id_nota, not_tmakan, not_meja ,id_pelanggan, not_waktu, not_jPembayaran, not_uCash, not_total, not_catatan, not_ver) VALUES ('$id_nota','$not_tmakan','$not_meja','$id_pelanggan','$not_waktu','$not_jPembayaran','$not_uCash','$not_total','$not_catatan','1')";
+$sql = "INSERT INTO nota (id_nota, not_tmakan, not_meja ,id_pelanggan, not_waktu, not_jPembayaran, not_uCash, not_total, not_catatan, not_ver) VALUES ('$id_nota','$not_tmakan','$not_meja','11111111111','$not_waktu','$not_jPembayaran','$not_uCash','$not_total','$not_catatan','1')";
 
 if ($conn->query($sql) === TRUE) {
  echo "Pesanan diterima";

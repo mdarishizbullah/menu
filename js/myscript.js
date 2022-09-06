@@ -66,7 +66,7 @@ function kapital(str){
 }
 
 function startPelanggan(){
-	isiMenu();
+	pindahPerson();
 	hitungKeranjang();
 	hitungDone();
 	isiPerson();
@@ -816,4 +816,904 @@ function isiPerson(){
 	fetch('php/detailPersonManager.php').then(response => response.json()).then(response => {
 		container.innerHTML = response[0].plg_nama;
 	});
+}
+
+function mulaiBekerja(){
+	document.getElementById("linkHome").style.display='none';
+	document.getElementById("linkCup").style.display='none';
+	document.getElementById("linkFood").style.display='none';
+	document.getElementById("linkCart").style.display='none';
+	document.getElementById("linkDone").style.display='none';
+	document.getElementById("linkPerson").style.display='none';
+	document.getElementById("person").style.display='none';
+	document.getElementById("linkPendapatan").style.display='block';
+	document.getElementById("linkPengeluaran").style.display='block';
+	document.getElementById("linkMenu").style.display='block';
+	document.getElementById("linkWorker").style.display='block';
+	document.getElementById("linkLaporan").style.display='block';
+	//untuk loop diarea kerjaan
+	document.getElementById("iPendapatan").classList.add("active");
+	document.getElementById("iPengeluaran").classList.remove("active");
+	document.getElementById("iMenu").classList.remove("active");
+	document.getElementById("iWorker").classList.remove("active");
+	document.getElementById("iLaporan").classList.remove("active");
+	document.getElementById("pendapatan").style.display='block';
+	document.getElementById("pengeluaran").style.display='none';
+	document.getElementById("menu").style.display='none';
+	document.getElementById("worker").style.display='none';
+	document.getElementById("laporan").style.display='none';
+}
+
+function pindahPendapatan(){
+	mulaiBekerja();
+}
+
+function pindahPengeluaran(){
+	document.getElementById("iPendapatan").classList.remove("active");
+	document.getElementById("iPengeluaran").classList.add("active");
+	document.getElementById("iMenu").classList.remove("active");
+	document.getElementById("iWorker").classList.remove("active");
+	document.getElementById("iLaporan").classList.remove("active");
+	document.getElementById("pendapatan").style.display='none';
+	document.getElementById("pengeluaran").style.display='block';
+	document.getElementById("menu").style.display='none';
+	document.getElementById("worker").style.display='none';
+	document.getElementById("laporan").style.display='none';
+}
+
+function pindahLaporan(){
+	document.getElementById("iPendapatan").classList.remove("active");
+	document.getElementById("iPengeluaran").classList.remove("active");
+	document.getElementById("iMenu").classList.remove("active");
+	document.getElementById("iWorker").classList.remove("active");
+	document.getElementById("iLaporan").classList.add("active");
+	document.getElementById("pendapatan").style.display='none';
+	document.getElementById("pengeluaran").style.display='none';
+	document.getElementById("menu").style.display='none';
+	document.getElementById("worker").style.display='none';
+	document.getElementById("laporan").style.display='block';
+}
+
+function pindahMenu(){
+	document.getElementById("iPendapatan").classList.remove("active");
+	document.getElementById("iPengeluaran").classList.remove("active");
+	document.getElementById("iMenu").classList.add("active");
+	document.getElementById("iWorker").classList.remove("active");
+	document.getElementById("iLaporan").classList.remove("active");
+	document.getElementById("pendapatan").style.display='none';
+	document.getElementById("pengeluaran").style.display='none';
+	document.getElementById("menu").style.display='block';
+	document.getElementById("worker").style.display='none';
+	document.getElementById("laporan").style.display='none';
+	isiEditMenu();
+}
+
+function pindahWorker(){
+	document.getElementById("iPendapatan").classList.remove("active");
+	document.getElementById("iPengeluaran").classList.remove("active");
+	document.getElementById("iMenu").classList.remove("active");
+	document.getElementById("iWorker").classList.add("active");
+	document.getElementById("iLaporan").classList.remove("active");
+	document.getElementById("pendapatan").style.display='none';
+	document.getElementById("pengeluaran").style.display='none';
+	document.getElementById("menu").style.display='none';
+	document.getElementById("worker").style.display='block';
+	document.getElementById("laporan").style.display='none';
+	isiPelanggan();
+	isiKaryawan();
+}
+
+function isiPendapatan(){
+	let tanggalMulai = document.getElementById("tanggalMulai").value;
+	let bulanMulai = document.getElementById("bulanMulai").value;
+	let tahunMulai = document.getElementById("tahunMulai").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhir").value;
+	let bulanAkhir = document.getElementById("bulanAkhir").value;
+	let tahunAkhir = document.getElementById("tahunAkhir").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let container = document.getElementById("sebelumPendapatan");
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/pendapatanHarianManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		let response = JSON.parse(this.responseText);
+		let jumlahPendapatan = response.length;
+		if(jumlahPendapatan == 0){
+			document.getElementById("belumAdaTransaksi").style.display='block';
+		}else if(jumlahPendapatan > 0){
+			document.getElementById("belumAdaTransaksi").style.display='none';
+		}
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			
+			barisData += `
+			<div class="container-fluid card mb-2">
+			<div class="row">
+				<div class="col-4 text-center text-muted mt-3">`+response[i].id_nota+`</div>
+				<div class="col-4 text-center text-muted">`+response[i].not_waktu+`</div>
+				<div class="col-4 text-center text-muted mt-3">`+("Rp. ")+parseFloat(response[i].not_total).toLocaleString('en')+`</div>
+			</div>
+			<div class="row" id="tombolDetailPendapatan`+response[i].id_nota+`" style="display: block;">
+			<button class="btn btn-primary" onClick="detailPendapatan(`+response[i].id_nota+`)">Detail Pendapatan</button>
+			</div>
+			<div class="container-fluid" id="isiNotaPendapatan`+response[i].id_nota+`" style="display: none;">
+			</div>
+			<div class="row" id="tombolCloseDetailPendapatan`+response[i].id_nota+`" style="display: none;">
+			<button class="btn btn-secondary" onClick="closeDetailPendapatan(`+response[i].id_nota+`)">Tutup Detail Pendapatan</button>
+			</div>
+			</div>
+			`;
+		}
+		container.innerHTML = barisData;
+	}
+  xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+  totalCash();
+  totalCashless();
+}
+
+function totalCash(){
+	let tanggalMulai = document.getElementById("tanggalMulai").value;
+	let bulanMulai = document.getElementById("bulanMulai").value;
+	let tahunMulai = document.getElementById("tahunMulai").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhir").value;
+	let bulanAkhir = document.getElementById("bulanAkhir").value;
+	let tahunAkhir = document.getElementById("tahunAkhir").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalCashManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		document.getElementById("totalCash").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("laporanCash").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("inputCash").setAttribute('value', new Number(this.responseText));
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function totalCashless(){
+	let tanggalMulai = document.getElementById("tanggalMulai").value;
+	let bulanMulai = document.getElementById("bulanMulai").value;
+	let tahunMulai = document.getElementById("tahunMulai").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhir").value;
+	let bulanAkhir = document.getElementById("bulanAkhir").value;
+	let tahunAkhir = document.getElementById("tahunAkhir").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalCashlessManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		document.getElementById("totalCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("laporanCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("inputCashless").setAttribute('value',new Number(this.responseText));
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function detailPendapatan(idSesuai){
+	document.getElementById("tombolDetailPendapatan"+idSesuai).style.display='none';
+	document.getElementById("tombolCloseDetailPendapatan"+idSesuai).style.display='block';
+	document.getElementById("isiNotaPendapatan"+idSesuai).style.display='block';
+	let containerNota = document.getElementById("isiNotaPendapatan"+idSesuai);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/detailPendapatanManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		let response = JSON.parse(this.responseText);
+		let statusPesanan = response[0].not_ver;
+		if (statusPesanan == 1){
+			statusPesanan = "Menunggu Petugas Datang";
+		}else if(statusPesanan == 2){
+			statusPesanan = "Lunas";
+		}else if(statusPesanan == 3){
+			statusPesanan = "Canceled";
+		}
+		let headerDetailNota =`
+  <div class="row">
+    <p class="mt-0 mb-0">`+kapital(response[0].not_tmakan)+`
+    </p> 
+  </div>
+  <div class="row">
+    <p class="mt-0 mb-0">Nomor Meja: `+response[0].not_meja+`
+    </p>
+  </div>
+  <div class="row">
+    <p class="mt-0 mb-0">Petugas: `+kapital(response[0].plg_nama)+`
+    </p>
+  </div>
+		`;
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+		barisData += `
+<div class="row">
+	<p class="mt-0 mb-0">`+kapital(response[i].prd_nama)+`</p>
+</div>
+<div class="row">
+	<p class="mt-0 mb-0 col-8">`+response[i].trs_quantity+` x `+parseFloat(response[i].prd_harga).toLocaleString('en')+`</p>
+	<p class="text-end mt-0 mb-0 col-4">`+parseFloat(response[i].trs_quantity*response[i].prd_harga).toLocaleString('en')+`</p>
+</div>
+		`
+		};
+		let footerDetailNota =`
+<div class="row">
+	<p class="text-end mt-3 mb-0">Total : `+parseFloat(response[0].not_total).toLocaleString('en')+`</p>
+</div>
+<div class="row">
+	<p class="text-end mt-0 mb-0">Bayar Tunai : `+parseFloat(response[0].not_uCash).toLocaleString('en')+`</p>
+</div>
+<div class="row">
+	<p class="text-end mt-0 mb-2">Kembali : `+parseFloat(response[0].not_uCash-response[0].not_total).toLocaleString('en')+`</p>
+</div>
+<div class="row">
+	<p class="text-start mt-0 mb-1">Metode Pembayaran : `+kapital(response[0].not_jPembayaran)+`</p>
+</div>
+<div class="row">
+	<p class="text-start mt-0 mb-1">Status Pesanan : `+statusPesanan+`</p>
+</div>
+<div class="row">
+	<p class="text-start mt-0 mb-0">Catatan :</p>
+</div>
+<div class="row mb-2">
+	<p class="text-start mt-0 mb-0">`+response[0].not_catatan+`</p>
+</div>
+		`;
+		containerNota.innerHTML = headerDetailNota + barisData + footerDetailNota;
+		}
+	xhr.send("id_nota="+idSesuai);
+}
+
+function closeDetailPendapatan(idSesuai){
+	document.getElementById("tombolDetailPendapatan"+idSesuai).style.display='block';
+	document.getElementById("tombolCloseDetailPendapatan"+idSesuai).style.display='none';
+	document.getElementById("isiNotaPendapatan"+idSesuai).style.display='none';
+}
+
+function isiPengeluaran(){
+	let tanggalMulaiPengeluaran = document.getElementById("tanggalMulaiPengeluaran").value;
+	let bulanMulaiPengeluaran = document.getElementById("bulanMulaiPengeluaran").value;
+	let tahunMulaiPengeluaran = document.getElementById("tahunMulaiPengeluaran").value;
+	let tanggalAkhirPengeluaran = document.getElementById("tanggalAkhirPengeluaran").value;
+	let bulanAkhirPengeluaran = document.getElementById("bulanAkhirPengeluaran").value;
+	let tahunAkhirPengeluaran = document.getElementById("tahunAkhirPengeluaran").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulaiPengeluaran, bulanMulaiPengeluaran, tanggalMulaiPengeluaran);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhirPengeluaran, bulanAkhirPengeluaran, tanggalAkhirPengeluaran);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let container = document.getElementById("sebelumPengeluaran");
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/pengeluaranManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		let response = JSON.parse(this.responseText);
+		let jumlahPengeluaran = response.length;
+		if(jumlahPengeluaran == 0){
+			document.getElementById("belumAdaPengeluaran").style.display='block';;
+		}else if(jumlahPengeluaran > 0){
+			document.getElementById("belumAdaPengeluaran").style.display='none';
+		}
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			const e = new Date(new Number(response[i].id_pengeluaran))
+			
+			barisData += `
+			<div class="container-fluid card mb-2">
+			<div class="row">
+				<div class="col-4 text-center text-muted mt-3">`+e.toLocaleTimeString('en-US')+`</div>
+				<div class="col-4 text-center text-muted">`+kapital(response[i].plg_nama)+`</div>
+				<div class="col-4 text-center text-muted mt-3">`+("Rp. ")+parseFloat(response[i].total_pengeluaran).toLocaleString('en')+`</div>
+			</div>
+			<div class="row" id="tombolDetailPengeluaran`+response[i].id_pengeluaran+`" style="display: block;">
+			<button class="btn btn-primary" onClick="detailPengeluaran(`+response[i].id_pengeluaran+`)">Detail pengeluaran</button>
+			</div>
+			<div class="container-fluid" id="isiPengeluaran`+response[i].id_pengeluaran+`" style="display: none;">
+			</div>
+			<div class="row" id="tombolCloseDetailPengeluaran`+response[i].id_pengeluaran+`" style="display: none;">
+			<button class="btn btn-secondary" onClick="closeDetailPengeluaran(`+response[i].id_pengeluaran+`)">Tutup Detail pengeluaran/button>
+			</div>
+			</div>
+			`;
+		}
+		container.innerHTML = barisData;
+	}
+  xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+  totalPengeluaran();
+}
+
+function totalPengeluaran(){
+	let tanggalMulaiPengeluaran = document.getElementById("tanggalMulaiPengeluaran").value;
+	let bulanMulaiPengeluaran = document.getElementById("bulanMulaiPengeluaran").value;
+	let tahunMulaiPengeluaran = document.getElementById("tahunMulaiPengeluaran").value;
+	let tanggalAkhirPengeluaran = document.getElementById("tanggalAkhirPengeluaran").value;
+	let bulanAkhirPengeluaran = document.getElementById("bulanAkhirPengeluaran").value;
+	let tahunAkhirPengeluaran = document.getElementById("tahunAkhirPengeluaran").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulaiPengeluaran, bulanMulaiPengeluaran, tanggalMulaiPengeluaran);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhirPengeluaran, bulanAkhirPengeluaran, tanggalAkhirPengeluaran);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalPengeluaran.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		document.getElementById("totalPengeluaran").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("laporanCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("inputCashless").setAttribute('value',new Number(this.responseText));
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function detailPengeluaran(idSesuai){
+	document.getElementById("tombolDetailPengeluaran"+idSesuai).style.display='none';
+	document.getElementById("tombolCloseDetailPengeluaran"+idSesuai).style.display='block';
+	document.getElementById("isiPengeluaran"+idSesuai).style.display='block';
+	let containerNota = document.getElementById("isiPengeluaran"+idSesuai);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/detailPengeluaranManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		let response = JSON.parse(this.responseText);
+		let headerDetailNota =`
+  <div class="row">
+    <p class="mt-0 mb-0 text-center">`+idSesuai+`
+    </p> 
+  </div>
+  <div class="row">
+    <p class="mt-0 mb-0 text-center">`+kapital(response[0].judul_pengeluaran)+`
+    </p> 
+  </div>
+  <div class="row">
+    <p class="mt-0 mb-0">Catatan:
+    </p>
+  </div>
+  <div class="row">
+    <p class="mt-0 mb-0">`+response[0].catatan_pengeluaran+`
+    </p>
+  </div>
+		`;
+		
+		containerNota.innerHTML = headerDetailNota;
+		}
+	xhr.send("id_pengeluaran="+idSesuai);
+}
+
+function closeDetailPengeluaran(idSesuai){
+	document.getElementById("tombolDetailPengeluaran"+idSesuai).style.display='block';
+	document.getElementById("tombolCloseDetailPengeluaran"+idSesuai).style.display='none';
+	document.getElementById("isiPengeluaran"+idSesuai).style.display='none';
+}
+
+function isiEditMenu(){
+	let containerMenu = document.getElementById("editIsiMenu");
+	fetch('php/datamasuk.php').then(response => response.json()).then(response => {
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			
+			barisData += `
+<section class="container-fluid col bg-light rounded card mt-1 px-0 p1">
+  <img src="./asset/menu/`+response[i].prd_image+`" class="card-img-top js-lazy-image col-12" alt="Card image cap">
+  <div class="mb-1">
+  <div class="container mt-1">
+<div class="container">
+  <input class="form-control form-control-sm" id="customFile`+response[i].id_product+`" type="file" accept="image/x-png,image/jpg,image/jpeg" name="image_file" onchange="onSetFilename(`+response[i].id_product+`)"/>
+<div class="progress mt-1">
+<div id="progressBar`+response[i].id_product+`" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+<button type="button" onclick="uploadFile(`+response[i].id_product+`);hapusDatabase(`+response[i].id_product+`);updateDatabase(`+response[i].id_product+`)" class="btn btn-warning text-white mt-2">Upload File</button>
+</div>
+</div>
+</div>
+  <div class="container">
+  <div class="container"><div class="container">
+    <div class="row">
+      <p class="col-12 mb-0 text-center" style="display: block;">`+kapital(response[i].kat_sub)+`
+      </p>
+    </div>
+    <div class="row">
+      <input class="form-control form-control-sm col-12 mb-0 text-center" id="namaRubah`+response[i].id_product+`" onchange="rubahNama(`+response[i].id_product+`)" value="`+response[i].prd_nama+`">
+    </div>
+    <div class="row">
+      <input class="form-control  form-control-sm text-center px-4 mt-2 mb-1" value="`+response[i].prd_harga+`" id="hargaRubah`+response[i].id_product+`" onchange="rubahHarga(`+response[i].id_product+`)">
+</div>
+<div class="row">
+<p class="small mb-0 mt-2 btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModalHapus`+response[i].id_product+`">Hapus</p>
+<div class="modal" id="myModalHapus`+response[i].id_product+`">
+		<div class="modal-dialog modal-dialog-centered">
+		  <div class="modal-content">
+			<!-- Modal Header -->
+			<div class="modal-header">
+			  <p class="modal-title mb-0">
+				Apakah anda yakin untuk menghapus
+			  </p>
+			</div>
+			<!-- Modal body -->
+			<button class="small mb-0 mt-2 btn btn-danger stretched-link" onclick="hapus(`+response[i].id_product+`)">Hapus</button>
+		  </div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+</section>
+			`;
+		}
+		containerMenu.innerHTML = barisData;
+	});
+}
+
+function rubahNama(idSesuai){
+	let namaBaru = document.getElementById("namaRubah"+idSesuai).value;
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/rubahNama.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_product="+new Number(idSesuai)+"&prd_nama="+namaBaru);
+}
+
+function rubahHarga(idSesuai){
+	let hargaBaru = document.getElementById("hargaRubah"+idSesuai).value;
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/rubahHarga.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_product="+new Number(idSesuai)+"&prd_harga="+hargaBaru);
+}
+
+function onSetFilename(idSesuai) {
+        let fileName = document.getElementById("customFile"+idSesuai).value.split("\\").pop();
+        document.getElementById("progressBar"+idSesuai).style.width="0%";
+        document.getElementById("progressBar"+idSesuai).classList.add("bg-success");
+    }
+
+function uploadFile(idSesuai) {
+	let image_files = document.getElementById('customFile'+idSesuai).files;
+	if(image_files.length) {
+		let formData = new FormData();
+		formData.append('image', image_files[0]);
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST", 'uploadphoto.php', true);
+		xhr.addEventListener("progress", function (e) {
+			if(e.lengthComputable) {
+				let percentComplete = e.loaded / e.total * 100;
+				document.getElementById("progressBar"+idSesuai).style.width=percentComplete + '%';
+			}
+		}, false);
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+					alert(this.responseText);
+			}
+		};
+		xhr.send(formData);
+	} else {
+		alert("Tidak ada gambar yang dipilih");
+	}
+}
+
+function hapusDatabase(idSesuai){
+	let image_files = document.getElementById('customFile'+idSesuai).files;
+	if(image_files.length) {
+	let fileName = document.getElementById("customFile"+idSesuai).value;
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", 'deletePhoto.php', true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_product="+idSesuai);
+	}
+}
+
+function updateDatabase(idSesuai){
+	let image_files = document.getElementById('customFile'+idSesuai).files;
+	if(image_files.length) {
+	let fileName = document.getElementById("customFile"+idSesuai).value.split("\\").pop();
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", 'php/updateDatabase.php', true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_product="+idSesuai+"&fileName="+fileName);
+	}
+}
+
+function isiPelanggan(){
+	let containerMenu = document.getElementById("pelanggan");
+	fetch('php/pelanggan.php').then(response => response.json()).then(response => {
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			
+			barisData += `
+<div class="row text-center mb-0 mt-0">
+<div class="container-fluid card mb-1 mt-0 bg-light">
+<div class="row">
+<div class="fw-semibold">`+kapital(response[i].plg_nama)+`</div>
+</div>
+<div class="row">
+<p class="text-muted">0`+response[i].id_pelanggan+`</p>
+</div>
+<div class="row">
+	<select class="form-select mt-0 text-center" id="rubahJabatan`+response[i].id_pelanggan+`" onchange="rubahJabatan(`+response[i].id_pelanggan+`)">
+		<option>Pilih Jabatan</option>
+		<option value="2">Kasir</option>
+		<option value="3">Manager</option>
+		<option value="4">Direktur</option>
+	 </select>
+</div>
+</div>
+</div>
+			`;
+		}
+		containerMenu.innerHTML = barisData;
+	});
+}
+
+function isiKaryawan(){
+	let containerMenu = document.getElementById("karyawan");
+	fetch('php/karyawan.php').then(response => response.json()).then(response => {
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			if(response[i].plg_jabatan == 2){
+				jabatanSaatIni = "Kasir";
+			}else if(response[i].plg_jabatan == 3){
+				jabatanSaatIni = "Manager";
+			}else if(response[i].plg_jabatan == 4){
+				jabatanSaatIni = "Direktur";
+			}else if(response[i].plg_jabatan == 5){
+				jabatanSaatIni = "Konten";
+			}
+			
+			barisData += `
+<div class="row text-center mb-0 mt-0">
+<div class="container-fluid card mb-1 mt-0 bg-light">
+<div class="row">
+<div class="fw-bold">`+jabatanSaatIni+`</div>
+</div>
+<div class="row">
+<div class="fw-semibold">`+kapital(response[i].plg_nama)+`</div>
+</div>
+<div class="row">
+<p class="text-muted">0`+response[i].id_pelanggan+`</p>
+</div>
+<div class="row">
+	<select class="form-select mt-0 text-center" id="rubahJabatan`+response[i].id_pelanggan+`" onchange="rubahJabatan(`+response[i].id_pelanggan+`)">
+		<option>Pilih Jabatan</option>
+		<option value="1">Pelanggan</option>
+		<option value="2">Kasir</option>
+		<option value="3">Manager</option>
+		<option value="4">Direktur</option>
+	 </select>
+</div>
+</div>
+</div>
+			`;
+		}
+		containerMenu.innerHTML = barisData;
+	});
+}
+
+function rubahJabatan(idSesuai){
+	let jabatanBaru = document.getElementById("rubahJabatan"+idSesuai).value;
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", 'php/updatePelanggan.php', true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_pelanggan="+idSesuai+"&plg_jabatan="+jabatanBaru);
+	pindahWorker();
+}
+
+function istirahat(){
+	document.getElementById("linkHome").style.display='block';
+	document.getElementById("linkCup").style.display='block';
+	document.getElementById("linkFood").style.display='block';
+	document.getElementById("linkCart").style.display='block';
+	document.getElementById("linkDone").style.display='block';
+	document.getElementById("linkPerson").style.display='block';
+	document.getElementById("linkPendapatan").style.display='none';
+	document.getElementById("linkPengeluaran").style.display='none';
+	document.getElementById("linkWorker").style.display='none';
+	document.getElementById("linkLaporan").style.display='none';
+	document.getElementById("linkMenu").style.display='none';
+	//untuk loop diarea kerjaan
+	document.getElementById("laporan").style.display='none';
+	pindahHome();
+}
+
+function isiLaporan(){
+	totalCashlessLaporan();
+	totalCashLaporan();
+	totalPengeluaranLaporan();
+	isiProdukTerjual();
+}
+
+function kalkulasi(){
+	totalPendapatan();
+}
+
+function totalCashlessLaporan(){
+	let tanggalMulai = document.getElementById("tanggalMulaiLaporan").value;
+	let bulanMulai = document.getElementById("bulanMulaiLaporan").value;
+	let tahunMulai = document.getElementById("tahunMulaiLaporan").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhirLaporan").value;
+	let bulanAkhir = document.getElementById("bulanAkhirLaporan").value;
+	let tahunAkhir = document.getElementById("tahunAkhirLaporan").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalCashlessManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		document.getElementById("laporanCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("laporanCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		document.getElementById("inputCashless").setAttribute('value',new Number(JSON.parse(this.responseText)));
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function totalCashLaporan(){
+	let tanggalMulai = document.getElementById("tanggalMulaiLaporan").value;
+	let bulanMulai = document.getElementById("bulanMulaiLaporan").value;
+	let tahunMulai = document.getElementById("tahunMulaiLaporan").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhirLaporan").value;
+	let bulanAkhir = document.getElementById("bulanAkhirLaporan").value;
+	let tahunAkhir = document.getElementById("tahunAkhirLaporan").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalCashManager.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		document.getElementById("laporanCash").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("laporanCash").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		document.getElementById("inputCash").setAttribute('value',new Number(JSON.parse(this.responseText)));
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function totalPengeluaranLaporan(){
+	let tanggalMulai = document.getElementById("tanggalMulaiLaporan").value;
+	let bulanMulai = document.getElementById("bulanMulaiLaporan").value;
+	let tahunMulai = document.getElementById("tahunMulaiLaporan").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhirLaporan").value;
+	let bulanAkhir = document.getElementById("bulanAkhirLaporan").value;
+	let tahunAkhir = document.getElementById("tahunAkhirLaporan").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalPengeluaran.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		document.getElementById("totalPengeluaranLaporan").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		//document.getElementById("laporanCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
+		document.getElementById("tPengeluaranLaporan").setAttribute('value',new Number(JSON.parse(this.responseText)));
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function totalPendapatan(){
+	let cash = document.getElementById("inputCash").value;
+	let cashless = document.getElementById("inputCashless").value;
+	let totalPendapatan = new Number(new Number(cash) + new Number(cashless));
+	document.getElementById("totalPendapatan").innerHTML = ("Rp. ")+parseFloat(totalPendapatan).toLocaleString('en');
+	document.getElementById("laporanPendapatan").setAttribute('value',new Number(totalPendapatan));
+	let pengeluaran = document.getElementById("tPengeluaranLaporan").value;
+	let totalKeuntungan = new Number(new Number(totalPendapatan) - new Number(pengeluaran));
+	document.getElementById("totalKeuntungan").innerHTML = ("Rp. ")+parseFloat(totalKeuntungan).toLocaleString('en');
+}
+
+function isiProdukTerjual(){
+	let tanggalMulai = document.getElementById("tanggalMulaiLaporan").value;
+	let bulanMulai = document.getElementById("bulanMulaiLaporan").value;
+	let tahunMulai = document.getElementById("tahunMulaiLaporan").value;
+	let tanggalAkhir = document.getElementById("tanggalAkhirLaporan").value;
+	let bulanAkhir = document.getElementById("bulanAkhirLaporan").value;
+	let tahunAkhir = document.getElementById("tahunAkhirLaporan").value;
+	let bukaBuku = new Date();
+	bukaBuku.setFullYear(tahunMulai, bulanMulai, tanggalMulai);
+	bukaBuku.setHours(0);
+	bukaBuku.setMinutes(0);
+	bukaBuku.setSeconds(0);
+	let tutupBuku = new Date();
+	tutupBuku.setFullYear(tahunAkhir, bulanAkhir, tanggalAkhir);
+	tutupBuku.setHours(23);
+	tutupBuku.setMinutes(59);
+	tutupBuku.setSeconds(59);
+	let container = document.getElementById("isiProdukTerjual");
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/totalPenjualan.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		let response = JSON.parse(this.responseText);
+		let barisData ='';
+		for(i = 0; i < response.length; i++){
+			
+			barisData += `
+<div class="row">
+	<div class="col-4"><div class="text-muted text-center">`+kapital(response[i].prd_nama)+`</div></div>
+	<div class="col-4"><div class="text-muted text-center">`+kapital(response[i].kat_sub)+`</div></div>
+	<div class="col-4"><div class="text-muted text-center">`+response[i].total+`</div></div>
+</div>
+<hr>
+			`;
+		}
+		container.innerHTML = barisData;
+	}
+	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
+}
+
+function bukaFormMenuBaru(){
+	document.getElementById("formMenu").style.display='block';
+	document.getElementById("bukaFormMenuBaru").style.display='none';
+	document.getElementById("tutupFormMenuBaru").style.display='block';
+	document.getElementById("spasiMenu").style.display='block';
+	isiKategori();
+}
+
+function tutupFormMenuBaru(){
+	document.getElementById("formMenu").style.display='none';
+	document.getElementById("bukaFormMenuBaru").style.display='block';
+	document.getElementById("tutupFormMenuBaru").style.display='none';
+	document.getElementById("spasiMenu").style.display='none';
+}
+
+function bukaFormKategoriBaru(){
+	document.getElementById("formKategori").style.display='block';
+	document.getElementById("bukaFormKategoriBaru").style.display='none';
+	document.getElementById("tutupFormKategoriBaru").style.display='block';
+	document.getElementById("spasiKategori").style.display='block';
+}
+
+function tutupFormKategoriBaru(){
+	document.getElementById("formKategori").style.display='none';
+	document.getElementById("bukaFormKategoriBaru").style.display='block';
+	document.getElementById("tutupFormKategoriBaru").style.display='none';
+	document.getElementById("spasiKategori").style.display='none';
+}
+
+function tambahKategori(){
+	let namaKategori = document.getElementById("namaKategori").value;
+	let jenisKategori = document.getElementById("jenisKategori").value;
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/tambahKategori.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("kat_jenis="+jenisKategori+"&kat_sub="+namaKategori);
+	tutupFormKategoriBaru();
+}
+
+function tambahMenu(){
+	let harga = document.getElementById("hargaMenu").value;
+	let kategori = document.getElementById("kategoriMenu").value;
+	let namaPhoto = document.getElementById("customFileMenu").value.split("\\").pop();;
+	let namaProduk = document.getElementById("namaMenu").value;
+	let d = new Date();
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/tambahMenu.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_product="+d.getTime()+"&prd_harga="+harga+"&prd_image="+namaPhoto+"&prd_nama="+namaProduk+"&id_pkategori="+kategori);
+}
+
+function isiKategori(){
+	let container = document.getElementById("kategoriMenu");
+	fetch('php/kategori.php').then(response => response.json()).then(response => {
+	let barisData ='';
+		for(i = 0; i < response.length; i++){
+			
+			barisData += `
+		<option value="`+response[i].id_pkategori+`">`+kapital(response[i].kat_sub)+`</option>
+			`;
+		}
+		container.innerHTML = barisData;
+	});
+}
+
+function onSetFilenameMenu() {
+        let fileName = document.getElementById("customFileMenu").value.split("\\").pop();
+        document.getElementById("progressBarMenu").style.width="0%";
+        document.getElementById("progressBarMenu").classList.add("bg-success");
+    }
+
+function uploadFileMenu() {
+	let image_files = document.getElementById('customFileMenu').files;
+	if(image_files.length) {
+		let formData = new FormData();
+		formData.append('image', image_files[0]);
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST", 'uploadphoto.php', true);
+		xhr.addEventListener("progress", function (e) {
+			if(e.lengthComputable) {
+				let percentComplete = e.loaded / e.total * 100;
+				document.getElementById("progressBarMenu").style.width=percentComplete + '%';
+			}
+		}, false);
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+					alert(this.responseText);
+			}
+		};
+		xhr.send(formData);
+	} else {
+		alert("Tidak ada gambar yang dipilih");
+	}
+}
+
+function hapus(idSesuai){
+	let xhr = new XMLHttpRequest();
+	xhr.open('POST','php/hapus.php',true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.onload = function(){
+		alert(this.responseText);
+	}
+	xhr.send("id_product="+idSesuai);
 }

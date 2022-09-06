@@ -199,6 +199,8 @@ function tambahKeranjang(id_product, prd_nama, prd_harga, prd_image, kat_sub, ju
 	}else{
 		keranjang.push(id_product);
 		createList(id_product, prd_nama, prd_harga, prd_image, kat_sub, jumlah_prd);
+		document.getElementById("belumTambah").style.display='none';
+		document.getElementById("tampilKeranjang").style.display='block';
 		document.getElementById("jumlahCart").style.display='block';
 		document.getElementById("jumlahCart").innerHTML = keranjang.length;
 		menghitung(id_product);
@@ -723,8 +725,8 @@ function notJBayar(){
 
 function createList(id_product, prd_nama, prd_harga, prd_image, kat_sub, jumlah_prd){
 	let newProduk = `
-	<div name="hapus">
-	<a class="text-start p-1"   onclick="removeItem(this);hapusData(`+id_product+`)">
+	<div class="container-fluid" name="hapus">
+	<a class="text-start" onclick="removeItem(this);hapusData(`+id_product+`)">
 	  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
 		<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
 	  </svg>
@@ -808,6 +810,8 @@ function hapusData(id_product) {
 	kembalian();
 	document.getElementById("jumlahCart").innerHTML = keranjang.length;
 	if (keranjang.length == 0){
+		document.getElementById("tampilKeranjang").style.display='none';
+		document.getElementById("belumTambah").style.display='block';
 		document.getElementById("jumlahCart").style.display='none';
 		document.getElementById("total").setAttribute('value', 0);
 		kembalian();
