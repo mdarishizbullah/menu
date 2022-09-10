@@ -879,7 +879,7 @@ function totalCash(){
 	xhr.onload = function(){
 		document.getElementById("totalCash").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
 		document.getElementById("laporanCash").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
-		document.getElementById("inputCash").setAttribute('value', new Number(this.responseText));
+		document.getElementById("inputCash").setAttribute('value', new Number(JSON.parse(this.responseText)));
 	}
 	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
 }
@@ -891,7 +891,7 @@ function totalCashless(){
 	xhr.onload = function(){
 		document.getElementById("totalCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
 		document.getElementById("laporanCashless").innerHTML = ("Rp. ")+parseFloat(JSON.parse(this.responseText)).toLocaleString('en');
-		document.getElementById("inputCashless").setAttribute('value',new Number(this.responseText));
+		document.getElementById("inputCashless").setAttribute('value',new Number(JSON.parse(this.responseText)));
 	}
 	xhr.send("tutupbuku="+tutupBuku.getTime()+"&bukabuku="+bukaBuku.getTime());
 }
@@ -904,7 +904,7 @@ function isiPendapatan(){
 	xhr.onload = function(){
 		let response = JSON.parse(this.responseText);
 		let jumlahPendapatan = response.length;
-		/*if(jumlahPendapatan == 0){
+		if(jumlahPendapatan == 0){
 			document.getElementById("jumlahPendapatan").style.display='none';
 			document.getElementById("fixedTopPendapatan").style.display='none';
 			document.getElementById("belumAdaTransaksi").style.display='block';
@@ -913,7 +913,7 @@ function isiPendapatan(){
 			document.getElementById("belumAdaTransaksi").style.display='none';
 			document.getElementById("jumlahPendapatan").style.display='block';
 			document.getElementById("jumlahPendapatan").innerHTML = jumlahPendapatan;
-		}*/
+		}
 		let barisData ='';
 		for(i = 0; i < response.length; i++){
 			
@@ -1192,41 +1192,85 @@ function detailPesananKasir(idSesuai){
 			statusPesanan = "Canceled";
 		}
 		let headerDetailNota =`
-  <div class="row">
-    <p class="mt-0 mb-0">`+response[0].id_nota+`
-    </p> 
-  </div>
-  <div class="row">
-    <p class="mt-0 mb-0">`+response[0].not_waktu+`
-    </p> 
-  </div>
-  <div class="row">
-    <p class="mt-0 mb-0">Nama Pemesan: `+kapital(response[0].plg_nama)+`
-    </p>
-  </div>
+<section id="untukdiprint`+response[0].id_nota+`">
+<table style="width:100%;">
+<tr>
+<td><h3 style="text-align: center; margin-bottom: 0px;">JS-89. Corp</h3></td>
+</tr>
+<tr>
+<td><h4 style="text-align: center; margin-bottom: 0px;">Jalan Siliwangi No 109</h4></td>
+</tr>
+<tr>
+<td><h5 style="text-align: center; margin-bottom: 0px;">081385571413</h5></td>
+</tr>
+</table>
+<hr>
+<table style="width:100%;">
+<tr>
+<td><p style="text-align: left;">No Nota</p></td>
+<td><p style="text-align: left;">: `+response[0].id_nota+`</p></td>
+</tr>
+<tr>
+<td><p style="text-align: left;   ">Waktu</p></td>
+<td><p style="text-align: left;   ">: `+response[0].not_waktu+`</p></td>
+</tr>
+<tr>
+<td><p style="text-align: left;   ">No Meja</p></td>
+<td><p style="text-align: left;   ">: `+response[i].not_meja+`</p></td>
+</tr>
+<tr>
+<td><p style="text-align: left;   ">Nama Pemesan</p></td>
+<td><p style="text-align: left;   ">: `+kapital(response[0].plg_nama)+`</p></td>
+</tr>
+</table>
+<br>
+<table style="width:100%;">
 		`;
 		let barisData ='';
 		for(i = 0; i < response.length; i++){
 		barisData += `
-<div class="row">
-	<p class="mt-0 mb-0">`+kapital(response[i].prd_nama)+`</p>
-</div>
-<div class="row">
-	<p class="mt-0 mb-0 col-8">`+response[i].trs_quantity+` x `+parseFloat(response[i].prd_harga).toLocaleString('en')+`</p>
-	<p class="text-end mt-0 mb-0 col-4">`+parseFloat(response[i].trs_quantity*response[i].prd_harga).toLocaleString('en')+`</p>
-</div>
+<tr>
+<td><p style="text-align: left;   ">`+kapital(response[i].prd_nama)+`</p></td>
+</tr>
+<tr>
+<td><p style="text-align: left;   ">`+response[i].trs_quantity+` x `+parseFloat(response[i].prd_harga).toLocaleString('en')+`</p></td>
+<td><p style="text-align: right;   ">`+parseFloat(response[i].trs_quantity*response[i].prd_harga).toLocaleString('en')+`</p></td>
+</tr>
 		`
 		};
 		let footerDetailNota =`
-<div class="row">
-	<p class="text-end mt-3 mb-0">Total : `+parseFloat(response[0].not_total).toLocaleString('en')+`</p>
-</div>
-<div class="row">
-	<p class="text-end mt-0 mb-0">Bayar Tunai : `+parseFloat(response[0].not_uCash).toLocaleString('en')+`</p>
-</div>
-<div class="row">
-	<p class="text-end mt-0 mb-2">Kembali : `+parseFloat(response[0].not_uCash-response[0].not_total).toLocaleString('en')+`</p>
-</div>
+<tr>
+<td><p style="text-align: right;   ">Total :</p></td>
+<td><p style="text-align: right;   ">`+parseFloat(response[0].not_total).toLocaleString('en')+`</p></td>
+<tr>
+<td><p style="text-align: right;   ">Uang cash :</p></td>
+<td><p style="text-align: right;   ">`+parseFloat(response[0].not_uCash).toLocaleString('en')+`</p></td>
+</tr>
+<tr>
+<td><p style="text-align: right;   ">Kembalian :</p></td>
+<td><p style="text-align: right;   ">`+parseFloat(response[0].not_uCash-response[0].not_total).toLocaleString('en')+`</p></td>
+</tr>
+</tr>
+</table>
+<br>
+<table style="width:100%;">
+<tr>
+<td><p style="text-align: left;">Catatan pelanggan:</p></td>
+</tr>
+<tr>
+<td><p style="text-align: left;">`+response[0].not_catatan+`</p></td>
+</tr>
+</table>
+<br>
+<table style="width:100%;">
+<tr>
+<td><p style="text-align: center;">Terimakasih atas kunjungan Anda</p></td>
+</tr>
+<tr>
+<td><p style="text-align: center;">powered by haizpro.my.id</p></td>
+</tr>
+</table>
+</section>
 <div class="row">
 <div class="col-3 text-start">
 <p class="small mb-0 mt-2 btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModalBatalkan`+response[0].id_nota+`">Batalkan</p>
@@ -1251,16 +1295,7 @@ function detailPesananKasir(idSesuai){
 		</div>
 	</div>
 <div class="row">
-	<p class="text-start mt-0 mb-1">Metode Pembayaran : `+kapital(response[0].not_jPembayaran)+`</p>
-</div>
-<div class="row">
 	<p class="text-start mt-0 mb-1">Status Pesanan : `+statusPesanan+`</p>
-</div>
-<div class="row">
-	<p class="text-start mt-0 mb-0">Catatan :</p>
-</div>
-<div class="row mb-2">
-	<p class="text-start mt-0 mb-0">`+response[0].not_catatan+`</p>
 </div>
 		`;
 		containerNota.innerHTML = headerDetailNota + barisData + footerDetailNota;
@@ -1277,6 +1312,12 @@ function lunasiPesanan(id_nota){
 	}
 	xhr.send("id_nota="+id_nota);
 	pindahJob();
+	let printContent = document.getElementById("untukdiprint"+id_nota);
+	let WinPrint = window.open('','','left=0,top=0');
+	WinPrint.document.write(printContent.innerHTML);
+	WinPrint.document.close();
+	WinPrint.focus();
+	WinPrint.print();
 }
 
 function closeDetailPesananKasir(idSesuai){
@@ -1334,7 +1375,7 @@ function simpanPengeluaran(){
 	xhr.open('POST','php/simpanPengeluaran.php',true);
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.onload = function(){
-		console.log(this.responseText);
+		
 	}
 	xhr.send("id_pengeluaran="+id_pengeluaran+"&judul_pengeluaran="+judul_pengeluaran+"&total_pengeluaran="+total_pengeluaran+"&catatan_pengeluaran="+catatan_pengeluaran);
 	//isiPengeluaran();
@@ -1550,7 +1591,6 @@ function isiProdukTerjual(){
 	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhr.onload = function(){
 		let response = JSON.parse(this.responseText);
-		console.log(response);
 		let barisData ='';
 		for(i = 0; i < response.length; i++){
 			
@@ -1570,8 +1610,8 @@ function isiProdukTerjual(){
 
 function istirahat(){
 	document.getElementById("linkHome").style.display='block';
-	document.getElementById("linkCup").style.display='block';
 	document.getElementById("linkFood").style.display='block';
+	document.getElementById("linkCup").style.display='block';
 	document.getElementById("linkCart").style.display='block';
 	document.getElementById("linkDone").style.display='block';
 	document.getElementById("linkPerson").style.display='block';
